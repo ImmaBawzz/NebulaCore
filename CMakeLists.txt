@@ -24,6 +24,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glm)
 
+FetchContent_Declare(
+    stb
+    GIT_REPOSITORY https://github.com/nothings/stb.git
+    GIT_TAG master
+)
+FetchContent_MakeAvailable(stb)
+
 # --- Engine Library ---
 file(GLOB_RECURSE ENGINE_SOURCES
     "engine/core/*.cpp"
@@ -34,7 +41,7 @@ file(GLOB_RECURSE ENGINE_SOURCES
 )
 
 add_library(NebulaCore STATIC ${ENGINE_SOURCES})
-target_include_directories(NebulaCore PUBLIC engine)
+target_include_directories(NebulaCore PUBLIC engine ${stb_SOURCE_DIR})
 target_link_libraries(NebulaCore PUBLIC glfw glad glm)
 
 # --- Sandbox Game ---

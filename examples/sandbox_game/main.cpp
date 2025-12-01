@@ -3,6 +3,7 @@
 #include "rendering/Renderer.h"
 #include "rendering/Buffer.h"
 #include "rendering/Shader.h"
+#include "rendering/Texture.h"
 #include "scripting/ScriptingAPI.h"
 
 // Example of a game-specific module
@@ -11,11 +12,12 @@ public:
     std::string GetName() const override { return "GameModule"; }
 
     bool OnRegister() override {
-        // Triangle Data
+        // Triangle Data with UVs
         float vertices[] = {
-            -0.5f, -0.5f, 0.0f,
-             0.5f, -0.5f, 0.0f,
-             0.0f,  0.5f, 0.0f
+            // Position         // UV
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+             0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+             0.0f,  0.5f, 0.0f, 0.5f, 1.0f
         };
 
         uint32_t indices[] = { 0, 1, 2 };
@@ -23,16 +25,32 @@ public:
         m_VertexArray = std::make_shared<nebula::VertexArray>();
         
         std::shared_ptr<nebula::VertexBuffer> vertexBuffer = std::make_shared<nebula::VertexBuffer>(vertices, sizeof(vertices));
+        // Layout: Position (3 floats), UV (2 floats)
+        nebula::BufferLayout layout = {
+            { nebula::ShaderDataType::Float3, "a_Position" },
+            { nebula::ShaderDataType::Float2, "a_TexCoord" }
+        };
+        vertexBuffer->SetLayout(layout);
         m_VertexArray->AddVertexBuffer(vertexBuffer);
 
         std::shared_ptr<nebula::IndexBuffer> indexBuffer = std::make_shared<nebula::IndexBuffer>(indices, sizeof(indices) / sizeof(uint32_t));
         m_VertexArray->SetIndexBuffer(indexBuffer);
 
-        // Basic Shader
+        // Create a Checkerboard Texture
+        m_Texture = std::make_shared<nebula::Texture2D>(2, 2);
+        uint32_t data[] = { 0xFFFFFFFF, 0xFF0000FF, 0xFF0000FF, 0xFFFFFFFF }; // White, Red, Red, White (RGBA)
+        m_Texture->SetData(data, sizeof(data));
+
+        // Basic Shader with Texture
         std::string vertexSrc = R"(
             #version 330 core
             layout(location = 0) in vec3 a_Position;
+            layout(location = 1) in vec2 a_TexCoord;
+            
+            out vec2 v_TexCoord;
+
             void main() {
+                v_TexCoord = a_TexCoord;
                 gl_Position = vec4(a_Position, 1.0);
             }
         )";
@@ -40,17 +58,25 @@ public:
         std::string fragmentSrc = R"(
             #version 330 core
             layout(location = 0) out vec4 color;
+            
+            in vec2 v_TexCoord;
+            
+            uniform sampler2D u_Texture;
+
             void main() {
-                color = vec4(0.8, 0.2, 0.3, 1.0);
+                color = texture(u_Texture, v_TexCoord);
             }
         )";
 
         m_Shader = std::make_shared<nebula::Shader>(vertexSrc, fragmentSrc);
+        m_Shader->Bind();
+        m_Shader->SetUniformInt("u_Texture", 0); // Slot 0
 
         return true;
     }
 
     void OnUpdate(float dt) override {
+        m_Texture->Bind(0);
         nebula::Renderer::Submit(m_VertexArray, m_Shader);
     }
 
@@ -59,6 +85,7 @@ public:
 private:
     std::shared_ptr<nebula::VertexArray> m_VertexArray;
     std::shared_ptr<nebula::Shader> m_Shader;
+    std::shared_ptr<nebula::Texture2D> m_Texture;
 };
 
 int main() {
