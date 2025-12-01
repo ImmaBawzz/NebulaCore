@@ -22,6 +22,12 @@ void Renderer::Clear() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void Renderer::Submit(const std::shared_ptr<VertexArray>& vertexArray, const std::shared_ptr<Shader>& shader) {
+    shader->Bind();
+    vertexArray->Bind();
+    glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+}
+
 bool Renderer::OnRegister() {
     Log::Info("Renderer Registered");
     Init();

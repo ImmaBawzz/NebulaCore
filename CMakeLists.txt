@@ -18,6 +18,12 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glad)
 
+FetchContent_Declare(
+    glm
+    GIT_REPOSITORY https://github.com/g-truc/glm.git
+)
+FetchContent_MakeAvailable(glm)
+
 # --- Engine Library ---
 file(GLOB_RECURSE ENGINE_SOURCES
     "engine/core/*.cpp"
@@ -29,7 +35,7 @@ file(GLOB_RECURSE ENGINE_SOURCES
 
 add_library(NebulaCore STATIC ${ENGINE_SOURCES})
 target_include_directories(NebulaCore PUBLIC engine)
-target_link_libraries(NebulaCore PUBLIC glfw glad)
+target_link_libraries(NebulaCore PUBLIC glfw glad glm)
 
 # --- Sandbox Game ---
 add_executable(sandbox_game examples/sandbox_game/main.cpp)

@@ -1,5 +1,8 @@
 #pragma once
 #include "../core/Module.h"
+#include "Shader.h"
+#include "Buffer.h"
+#include <memory>
 
 namespace nebula {
 
@@ -11,6 +14,8 @@ public:
 
     static void SetClearColor(float r, float g, float b, float a);
     static void Clear();
+
+    static void Submit(const std::shared_ptr<VertexArray>& vertexArray, const std::shared_ptr<Shader>& shader);
 
     // Internal
     bool OnRegister() override;
