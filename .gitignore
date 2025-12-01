@@ -39,3 +39,15 @@
 
 # debug information files
 *.dwo
+
+# Build directories
+build/
+bin/
+lib/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# VS Code
+.vscode/
