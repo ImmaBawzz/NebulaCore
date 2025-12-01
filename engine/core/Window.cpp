@@ -1,3 +1,4 @@
+#include <glad/glad.h>
 #include "Window.h"
 #include "Logging.h"
 
@@ -31,6 +32,11 @@ bool Window::OnRegister() {
 
     glfwMakeContextCurrent(m_Window);
     glfwSetWindowUserPointer(m_Window, &m_Data);
+
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        Log::Error("Failed to initialize GLAD!");
+        return false;
+    }
 
     return true;
 }

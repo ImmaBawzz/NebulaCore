@@ -12,6 +12,12 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glfw)
 
+FetchContent_Declare(
+    glad
+    GIT_REPOSITORY https://github.com/libigl/libigl-glad.git
+)
+FetchContent_MakeAvailable(glad)
+
 # --- Engine Library ---
 file(GLOB_RECURSE ENGINE_SOURCES
     "engine/core/*.cpp"
@@ -23,7 +29,7 @@ file(GLOB_RECURSE ENGINE_SOURCES
 
 add_library(NebulaCore STATIC ${ENGINE_SOURCES})
 target_include_directories(NebulaCore PUBLIC engine)
-target_link_libraries(NebulaCore PUBLIC glfw)
+target_link_libraries(NebulaCore PUBLIC glfw glad)
 
 # --- Sandbox Game ---
 add_executable(sandbox_game examples/sandbox_game/main.cpp)

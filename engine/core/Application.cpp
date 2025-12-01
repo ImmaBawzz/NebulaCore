@@ -1,5 +1,7 @@
 #include "Application.h"
 #include "Window.h"
+#include "../rendering/Renderer.h"
+#include "Input.h"
 #include "Logging.h"
 #include <chrono>
 #include <thread>
@@ -12,6 +14,10 @@ Application::Application() {
     s_Instance = this;
     m_Window = std::make_shared<Window>();
     RegisterModule(m_Window);
+    
+    auto renderer = std::make_shared<Renderer>();
+    RegisterModule(renderer);
+    Renderer::SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 }
 
 void Application::RegisterModule(std::shared_ptr<IModule> module) {
@@ -31,6 +37,10 @@ void Application::Run() {
         previous = now;
 
         if (m_Window->ShouldClose()) {
+            m_Running = false;
+        }
+
+        if (Input::IsKeyPressed(256)) { // GLFW_KEY_ESCAPE
             m_Running = false;
         }
 
